@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Postgres sample app</title>
+</head>
+<body>
+    <h1>Search Comments & Dummy Table</h1>
+    <form id="searchForm">
+        <label for="search">Search ID:</label>
+        <input type="text" id="search" name="search" required />
+        <button type="submit">Search</button>
+    </form>
+    <div id="result"></div>
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const search = document.getElementById('search').value;
+            const resDiv = document.getElementById('result');
+            resDiv.textContent = 'Loading...';
+            try {
+                const response = await fetch(`/get?search=${encodeURIComponent(search)}`);
+                const data = await response.json();
+                if (data.status === 'ok') {
+                    resDiv.innerHTML = `<h2>Board Result</h2><pre>${JSON.stringify(data.boardRes, null, 2)}</pre>` +
+                        `<h2>Comments</h2><pre>${JSON.stringify(data.posts, null, 2)}</pre>`;
+                } else {
+                    resDiv.textContent = 'Error: ' + data.message;
+                }
+            } catch (err) {
+                resDiv.textContent = 'Request failed.';
+            }
+        });
+    </script>
+</body>
+</html>
